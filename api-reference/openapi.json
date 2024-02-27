@@ -1,194 +1,1226 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.2",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
-    "version": "1.0.0"
+    "title": "Obspher private API",
+    "version": "0.0.1",
+    "description": "last updated : 2024-02-22 17:20:09\n\n# Authentication\n\n<!-- ReDoc-Inject: <security-definitions> -->"
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
-    }
-  ],
-  "security": [
-    {
-      "bearerAuth": []
+      "url": "https://obspher.dev"
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+    "/register/user/finalize": {
+      "post": {
+        "summary": "Finalize user registration",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uid": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "uid"
+                ]
+              },
+              "example": {
+                "uid": "d840fdfb-b1e1-4cb8-9296-e8d1b03cb20d"
+              }
             }
           }
-        ],
+        },
         "responses": {
-          "200": {
-            "description": "Plant response",
+          "201": {
+            "description": "User registration is finalized",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                },
+                "example": {
+                  "error": {
+                    "internal": "user_not_found",
+                    "details": "Some details about the error"
                   }
                 }
               }
             }
           },
-          "400": {
-            "description": "Unexpected error",
+          "417": {
+            "description": "Phone call confirmation needed",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/error"
+                },
+                "example": {
+                  "error": {
+                    "internal": "phone_call_confirmation_needed",
+                    "details": "Some details about the error"
+                  }
                 }
               }
             }
           },
-          "400": {
-            "description": "unexpected error",
+          "500": {
+            "description": "Unable to finalize",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/error"
+                },
+                "example": {
+                  "error": {
+                    "internal": "unable_to_finalize",
+                    "details": "Some details about the error"
+                  }
                 }
               }
             }
+          },
+          "default": {
+            "$ref": "#/paths/~1ping/get/responses/default"
           }
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
+    "/register/user/update": {
+      "post": {
+        "summary": "Finalize user registration",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uid": {
+                    "type": "string"
+                  },
+                  "first_name": {
+                    "type": "string",
+                    "x-format": "wchar"
+                  },
+                  "last_name": {
+                    "type": "string",
+                    "x-format": "wchar"
+                  },
+                  "cgu_acceptance": {
+                    "type": "boolean"
+                  },
+                  "pwd": {
+                    "type": "string",
+                    "x-format": "hexadecimal",
+                    "minLength": 16,
+                    "maxLength": 100
+                  },
+                  "salt": {
+                    "type": "string",
+                    "x-format": "graph",
+                    "minLength": 16,
+                    "maxLength": 16
+                  },
+                  "hash_type": {
+                    "type": "string",
+                    "enum": [
+                      "argon2id"
+                    ]
+                  }
+                },
+                "required": [
+                  "uid"
+                ]
+              },
+              "example": {
+                "uid": "d840fdfb-b1e1-4cb8-9296-e8d1b03cb20d",
+                "cgu_acceptance": true
+              }
             }
           }
-        ],
+        },
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
+          "202": {
+            "description": "Infos updated",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "missing": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "first_name",
+                              "last_name",
+                              "cgu_acceptance",
+                              "pwd",
+                              "salt",
+                              "hash_type"
+                            ]
+                          }
+                        },
+                        "filled": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "first_name",
+                              "last_name",
+                              "cgu_acceptance",
+                              "pwd",
+                              "salt",
+                              "hash_type"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "missing",
+                        "filled"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                },
+                "example": {
+                  "data": {
+                    "missing": [
+                      "first_name",
+                      "last_name"
+                    ],
+                    "filled": [
+                      "cgu_acceptance",
+                      "pwd",
+                      "salt",
+                      "hash_type"
+                    ]
+                  }
                 }
               }
             }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                },
+                "example": {
+                  "error": {
+                    "internal": "user_not_found",
+                    "details": "Some details about the error"
+                  }
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "User is pending finalize",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                },
+                "example": {
+                  "error": {
+                    "internal": "user_is_pending_finalize",
+                    "details": "Some details about the error"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/paths/~1ping/get/responses/default"
+          }
+        }
+      }
+    },
+    "/token/generate/professional": {
+      "post": {
+        "summary": "Generate access token with mail address or phone number +33612345678 please work please",
+        "description": "Generate a token access works has login",
+        "tags": [
+          "token"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "New token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "jwt_token": {
+                          "type": "string"
+                        },
+                        "public_key": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "jwt_token",
+                        "public_key"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                },
+                "example": {
+                  "data": {
+                    "jwt_token": "eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMTY3NjA0Nzk2MCIsIm5vdF9iZWZvcmUiOiIxNjc2MDQ2OTYwIiwiaXNzdWVyIjp0cnVlLCJpc3N1ZWRfYXQiOjE2NzYwNDY5NjAsImp0aSI6IjAxMjM0NTY3ODlBQkNERUYwMTIzNDU2Nzg5QUJDREVGMDEyMzQ1Njc4OUFCQ0RFRjAxMjM0NTY3ODlBQkNERUYiLCJ1aWQiOiIwMGRlYTA5OC1jM2FiLTRhODUtYTliYy0xNTY3Yzk4NzQ0YTEifQ.iGWr3ISESRxq8FY6AJZPnwv9CHsXRF7DOVmqGmE3FN_CrctMoKVhONNAutGGPKUGl38x65m7CE0ZAkifQsi7VMscLb9Y7gelmPLyEwvYpb2X0PKRVjgkPLUhSbhB7asa2_FZJaoBuTJSDSgay5TSHydqo6f8lqieh1PhO9nNa-JRmOEPfsMxUEIAJO1QaJcWMyOwWUMqqPvlTAt0EtxRdE732yXqlsrAdLESTnAA64-lCZD_2L2o-JIfxHQQLXxUn9XeohcnPvaqrt0XBcVrH9FwQkqgRQNsdYd7ax8qXeeKZ3amiYGw1pT-qeSLRAwOyQuuCbjJCnonjVSfO2F1Pw",
+                    "public_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu1SU1LfVLPHCozMxH2Mo\n4lgOEePzNm0tRgeLezV6ffAt0gunVTLw7onLRnrq0/IzW7yWR7QkrmBL7jTKEn5u\n+qKhbwKfBstIs+bMY2Zkp18gnTxKLxoS2tFczGkPLPgizskuemMghRniWaoLcyeh\nkd3qqGElvW/VDL5AaWTg0nLVkjRo9z+40RQzuVaE8AkAFmxZzow3x+VJYKdjykkJ\n0iT9wCS0DRTXu269V264Vf/3jvredZiKRkgwlL9xNAwxXFg0x/XFw005UWVRIkdg\ncKWTjpBP2dPwVZ4WWC+9aGVd+Gyn1o0CLelf4rEjGoXbAAEgAqeGUxrcIlbjXfbc\nmwIDAQAB\n-----END PUBLIC KEY-----"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/paths/~1ping/get/responses/default"
+          }
+        }
+      }
+    },
+    "/token/refresh": {
+      "post": {
+        "summary": "Refresh access token",
+        "tags": [
+          "token"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "New token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "jwt_token": {
+                          "type": "string"
+                        },
+                        "public_key": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "jwt_token",
+                        "public_key"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                },
+                "example": {
+                  "data": {
+                    "jwt_token": "eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMTY3NjA0Nzk2MCIsIm5vdF9iZWZvcmUiOiIxNjc2MDQ2OTYwIiwiaXNzdWVyIjp0cnVlLCJpc3N1ZWRfYXQiOjE2NzYwNDY5NjAsImp0aSI6IjAxMjM0NTY3ODlBQkNERUYwMTIzNDU2Nzg5QUJDREVGMDEyMzQ1Njc4OUFCQ0RFRjAxMjM0NTY3ODlBQkNERUYiLCJ1aWQiOiIwMGRlYTA5OC1jM2FiLTRhODUtYTliYy0xNTY3Yzk4NzQ0YTEifQ.iGWr3ISESRxq8FY6AJZPnwv9CHsXRF7DOVmqGmE3FN_CrctMoKVhONNAutGGPKUGl38x65m7CE0ZAkifQsi7VMscLb9Y7gelmPLyEwvYpb2X0PKRVjgkPLUhSbhB7asa2_FZJaoBuTJSDSgay5TSHydqo6f8lqieh1PhO9nNa-JRmOEPfsMxUEIAJO1QaJcWMyOwWUMqqPvlTAt0EtxRdE732yXqlsrAdLESTnAA64-lCZD_2L2o-JIfxHQQLXxUn9XeohcnPvaqrt0XBcVrH9FwQkqgRQNsdYd7ax8qXeeKZ3amiYGw1pT-qeSLRAwOyQuuCbjJCnonjVSfO2F1Pw",
+                    "public_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu1SU1LfVLPHCozMxH2Mo\n4lgOEePzNm0tRgeLezV6ffAt0gunVTLw7onLRnrq0/IzW7yWR7QkrmBL7jTKEn5u\n+qKhbwKfBstIs+bMY2Zkp18gnTxKLxoS2tFczGkPLPgizskuemMghRniWaoLcyeh\nkd3qqGElvW/VDL5AaWTg0nLVkjRo9z+40RQzuVaE8AkAFmxZzow3x+VJYKdjykkJ\n0iT9wCS0DRTXu269V264Vf/3jvredZiKRkgwlL9xNAwxXFg0x/XFw005UWVRIkdg\ncKWTjpBP2dPwVZ4WWC+9aGVd+Gyn1o0CLelf4rEjGoXbAAEgAqeGUxrcIlbjXfbc\nmwIDAQAB\n-----END PUBLIC KEY-----"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Refresh token server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                },
+                "example": {
+                  "error": {
+                    "internal": "refresh_token_server_error",
+                    "details": "Some details about the error"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/paths/~1ping/get/responses/default"
+          }
+        }
+      }
+    },
+    "/token/revoke": {
+      "post": {
+        "summary": "Revoke access token",
+        "tags": [
+          "token"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Token revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/paths/~1ping/get/responses/default"
+          }
+        }
+      }
+    },
+    "/professional/change/email": {
+      "post": {
+        "summary": "Change mail",
+        "tags": [
+          "professional"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "minLength": 6,
+                    "maxLength": 320,
+                    "pattern": "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              },
+              "example": {
+                "email": "example@example.com"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mail changed, pending approval",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email is already used by another user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                },
+                "example": {
+                  "error": {
+                    "internal": "email_is_already_used_by_another_user",
+                    "details": "Some details about the error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unable to send mail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                },
+                "example": {
+                  "error": {
+                    "internal": "unable_to_send_mail",
+                    "details": "Some details about the error"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/paths/~1ping/get/responses/default"
+          }
+        }
+      }
+    },
+    "/professional/change/email/confirmation": {
+      "post": {
+        "summary": "Confirm new mail",
+        "tags": [
+          "professional"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "x-format": "hexadecimal",
+                    "minLength": 64,
+                    "maxLength": 64
+                  }
+                },
+                "required": [
+                  "token"
+                ]
+              },
+              "example": {
+                "token": "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Mail changed, pending approval",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Token not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                },
+                "example": {
+                  "error": {
+                    "internal": "token_not_found",
+                    "details": "Some details about the error"
+                  }
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "User with same mail already exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                },
+                "example": {
+                  "error": {
+                    "internal": "user_with_same_mail_already_exist",
+                    "details": "Some details about the error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unable to send mail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                },
+                "example": {
+                  "error": {
+                    "internal": "unable_to_send_mail",
+                    "details": "Some details about the error"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/paths/~1ping/get/responses/default"
+          }
+        }
+      }
+    },
+    "/professional/change/password": {
+      "post": {
+        "summary": "Change password",
+        "tags": [
+          "professional"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "pwd": {
+                    "type": "string",
+                    "x-format": "hexadecimal",
+                    "minLength": 16,
+                    "maxLength": 100
+                  },
+                  "salt": {
+                    "type": "string",
+                    "x-format": "graph",
+                    "minLength": 16,
+                    "maxLength": 16
+                  },
+                  "hash_type": {
+                    "type": "string",
+                    "enum": [
+                      "argon2id"
+                    ]
+                  }
+                },
+                "required": [
+                  "pwd",
+                  "salt",
+                  "hash_type"
+                ]
+              },
+              "example": {
+                "pwd": "0123456789ABCDEF0123456789ABCDEF",
+                "salt": "azertyuiopqsdfgh",
+                "hash_type": "argon2id"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Error password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                },
+                "example": {
+                  "error": {
+                    "internal": "error_password",
+                    "details": "Some details about the error"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/paths/~1ping/get/responses/default"
+          }
+        }
+      }
+    },
+    "/rental/operator/cancel": {
+      "delete": {
+        "summary": "Cancel a rental",
+        "description": "Cancel a rental. Will free vehicle and driver if any attached",
+        "tags": [
+          "rental"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rental_uuid": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "required": [
+                  "rental_uuid"
+                ]
+              },
+              "example": {
+                "rental_uuid": "fe77fc5c-fa83-4532-b0af-129a5ac7cd74"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Rental is deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Rental can not be found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                },
+                "example": {
+                  "error": {
+                    "internal": "rental_can_not_be_found",
+                    "details": "Some details about the error"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/paths/~1ping/get/responses/default"
+          }
+        }
+      }
+    },
+    "/rental/detail": {
+      "get": {
+        "summary": "Get rental details",
+        "description": "Get rental details",
+        "tags": [
+          "rental"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "uuid",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "description": "UUID",
+            "example": "17029d44-e9c8-4e3c-abed-ba98e220d869"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Details about rental",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "distance": {
+                          "type": "number",
+                          "format": "double",
+                          "x-format": "length"
+                        },
+                        "billing_address_uuid": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "depot_uuid": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "vehicle": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "driver": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "from": {
+                          "type": "integer",
+                          "x-format": "timestamp"
+                        },
+                        "to": {
+                          "type": "integer",
+                          "x-format": "timestamp"
+                        },
+                        "customer": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "operator_company": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "comments": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "references": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": [
+                        "distance",
+                        "billing_address_uuid",
+                        "depot_uuid",
+                        "vehicle",
+                        "from",
+                        "to",
+                        "customer",
+                        "operator_company",
+                        "comments",
+                        "references"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                },
+                "example": {
+                  "data": {
+                    "vehicle": "19b7ad5d-731e-4e74-aae1-7d76681629e8",
+                    "from": 1679007600,
+                    "to": 1679094000,
+                    "customer": "5f3bd225-e186-4aa0-b8a8-f48c4006a9e7",
+                    "operator_company": "b17ba258-216c-4bc3-b0ac-4982b30297bd",
+                    "comments": [
+                      "Some comment",
+                      "Other one"
+                    ],
+                    "references": [
+                      "XXX",
+                      "YYY"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Rental not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                },
+                "example": {
+                  "error": {
+                    "internal": "rental_not_found",
+                    "details": "Some details about the error"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/paths/~1ping/get/responses/default"
           }
         }
       }
     }
   },
-  "components": {
-    "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
-      }
+  "tags": [
+    {
+      "name": "driver",
+      "description": "Everything that we can do on a driver"
     },
+    {
+      "name": "legal",
+      "description": "Everything that we can do on the legal"
+    },
+    {
+      "name": "token",
+      "description": "Connection, access token managment"
+    },
+    {
+      "name": "delivery",
+      "description": "Request new deliveries, modify, validate, and so on"
+    },
+    {
+      "name": "company",
+      "description": "Everything that we can do on a company"
+    },
+    {
+      "name": "contract",
+      "description": "Everything that we can do on contracts"
+    },
+    {
+      "name": "vehicle",
+      "description": "Everything that we can do on a vehicle"
+    },
+    {
+      "name": "declarative",
+      "description": "All declaratives"
+    },
+    {
+      "name": "rental",
+      "description": "All about rental"
+    },
+    {
+      "name": "bin-pack",
+      "description": "All about the bin packing algorithm"
+    },
+    {
+      "name": "geography",
+      "description": "All about geography (address, waypoints, ...)"
+    },
+    {
+      "name": "equipment",
+      "description": "All about equipment"
+    },
+    {
+      "name": "professional",
+      "description": "Everything that we can do on a professional / user"
+    }
+  ],
+  "components": {
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
-        "scheme": "bearer"
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "uuid": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "internal": {
+                "type": "string"
+              },
+              "details": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "internal",
+              "details"
+            ]
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "phone_number": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 16,
+        "pattern": "^\\+[1-9]\\d{1,14}$"
+      },
+      "address": {
+        "type": "object",
+        "properties": {
+          "recipient_name": {
+            "type": "string",
+            "x-format": "wchar"
+          },
+          "street_number": {
+            "type": "string"
+          },
+          "street_name": {
+            "type": "string"
+          },
+          "postal_code": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "recipient_name",
+          "street_number",
+          "street_name",
+          "postal_code",
+          "city",
+          "country"
+        ]
+      },
+      "delivery_waypoint": {
+        "type": "object",
+        "properties": {
+          "contact": {
+            "type": "object",
+            "properties": {
+              "first_name": {
+                "type": "string",
+                "x-format": "wchar"
+              },
+              "last_name": {
+                "type": "string",
+                "x-format": "wchar"
+              },
+              "phone_number": {
+                "$ref": "#/components/schemas/phone_number"
+              }
+            },
+            "required": [
+              "first_name",
+              "last_name",
+              "phone_number"
+            ]
+          },
+          "address": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "longitude": {
+            "type": "number",
+            "x-format": "degree_angle",
+            "minimum": -180,
+            "maximum": 180
+          },
+          "latitude": {
+            "type": "number",
+            "x-format": "degree_angle",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": []
+          },
+          "documents_urls": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 100,
+              "pattern": "^(?:http(s)?:\\/\\/)?[\\w.-]+(?:\\.[\\w\\.-]+)+[\\w\\-\\._~:/?#[\\]@!\\$&'\\(\\)\\*\\+,;=.]+$"
+            },
+            "default": []
+          },
+          "accessibility": {
+            "type": "object",
+            "properties": {
+              "weight": {
+                "description": "in kilograms",
+                "type": "number",
+                "minimum": 0
+              },
+              "height": {
+                "description": "in meters",
+                "type": "number",
+                "minimum": 0
+              },
+              "length": {
+                "description": "in meters",
+                "type": "number",
+                "minimum": 0
+              },
+              "width": {
+                "description": "in meters",
+                "type": "number",
+                "minimum": 0
+              },
+              "has_pallett_truck": {
+                "type": "boolean",
+                "default": false
+              },
+              "has_elevator": {
+                "type": "boolean",
+                "default": false
+              },
+              "has_plateform": {
+                "type": "boolean",
+                "default": false
+              }
+            },
+            "default": {}
+          }
+        },
+        "required": [
+          "contact",
+          "address",
+          "longitude",
+          "latitude"
+        ]
+      },
+      "position": {
+        "type": "object",
+        "properties": {
+          "longitude": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          },
+          "latitude": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          }
+        },
+        "required": [
+          "longitude",
+          "latitude"
+        ]
+      },
+      "right_scope": {
+        "type": "string",
+        "enum": [
+          "full",
+          "enterprise",
+          "limited",
+          "none"
+        ]
+      },
+      "rights": {
+        "type": "object",
+        "properties": {
+          "read": {
+            "$ref": "#/components/schemas/right_scope"
+          },
+          "update": {
+            "$ref": "#/components/schemas/right_scope"
+          },
+          "creation": {
+            "$ref": "#/components/schemas/right_scope"
+          },
+          "deletion": {
+            "$ref": "#/components/schemas/right_scope"
+          }
+        },
+        "required": [
+          "read",
+          "update",
+          "creation",
+          "deletion"
+        ]
       }
     }
   }
