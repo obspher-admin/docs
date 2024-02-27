@@ -1,0 +1,63 @@
+openapi: 3.0.2
+info:
+  title: Obspher private API
+  version: 0.0.1
+  description: "last updated : {{{date}}}"
+servers:
+  - url: https://obspher.dev
+paths:
+  /status:
+    $ref: "./paths/status.yaml"
+tags:
+  - name: driver
+    description: Everything that we can do on a driver
+  - name: legal
+    description: Everything that we can do on the legal
+  - name: token
+    description: Connection, access token managment
+  - name: delivery
+    description: Request new deliveries, modify, validate, and so on
+  - name: company
+    description: Everything that we can do on a company
+  - name: contract
+    description: Everything that we can do on contracts
+  - name: vehicle
+    description: Everything that we can do on a vehicle
+  - name: declarative
+    description: All declaratives
+  - name: rental
+    description: All about rental
+  - name: bin-pack
+    description: All about the bin packing algorithm
+  - name: geography
+    description: All about geography (address, waypoints, ...)
+  - name: equipment
+    description: All about equipment
+  - name: professional
+    description: Everything that we can do on a professional / user
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    uuid:
+      $ref: "./components/schemas/uuid.yaml"
+    error:
+      $ref: "./components/schemas/error.yaml"
+    phone_number:
+      $ref: "./components/schemas/phone_number.yaml"
+    address:
+      $ref: "./components/schemas/address.yaml"
+    delivery_waypoint:
+      $ref: "./components/schemas/delivery_waypoint.yaml"
+    position:
+      $ref: "./components/schemas/position.yaml"
+    right_scope:
+      $ref: "./components/schemas/right_scope.yaml"
+    rights:
+      $ref: "./components/schemas/rights.yaml"
